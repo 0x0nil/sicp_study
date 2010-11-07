@@ -10,7 +10,7 @@
 ;; 解：这里应该是一个精度设计的问题，这里有一个精度的问题，现在的精度
 ;; 是0.001,当求一个比较小的数的时候会出问题。比如
 
-(good-enough? 0.01 0.001)
+;; (good-enough? 0.01 0.001)
 
 ;; 0.01是一个不合适的值但是这个会返回它是一个合适的值.当然我们可以把精度
 ;; 设的很细小，比如
@@ -25,5 +25,24 @@
 ;; 由于计算精度的问题，improve函数有可能返回返回上一个猜测的数，那个程序就会
 ;; 进入无限循环，比如
 
-(good-enough? 3162277.6601683795 10000000000000)
-(sqrt 10000000000000)  ;; 求值这个表达式会进入无限循环
+;; (good-enough? 3162277.6601683795 10000000000000)
+;; (sqrt 10000000000000)  ;; 求值这个表达式会进入无限循环
+
+(define (good-enough? prev next)
+  (< (abs (- prev next)) (* 0.001 next)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (sqrt-iter prev next x)
+  (if (good-enough? prev next)
+    next
+    (sqrt-iter next (improve next x) x)))
+
+(define (sqrt x)
+  (sqrt-iter 1.1 1.0 x))
+
+(sqrt 4)
