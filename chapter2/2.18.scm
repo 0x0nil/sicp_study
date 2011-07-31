@@ -10,10 +10,18 @@
 ;;    (cons (reverse (cdr items)) (car items))))
 
 ;; 2
+;;(define (reverse items)
+;;  (if (null? (cdr items))
+;;    (car items)
+;;    (cons (reverse (cdr items)) (car items))))
+
+;; 3
 (define (reverse items)
-  (if (null? (cdr items))
-    (car items)
-    (cons (reverse (cdr items)) (car items))))
+  (define (iter old new)
+    (if (null? old)
+      new
+      (iter (cdr old) cons((car old) new))))
+  (iter items '()))
 
 ;; test
 
