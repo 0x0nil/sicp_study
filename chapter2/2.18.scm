@@ -37,6 +37,7 @@
 ;; 方法2的结果也是怪怪的： ((((25 . 16) . 9) . 4) . 1)
 ;; 并不是想要的(25 16 9 4 1).
 ;; why?
+;; 这个使用(define nil '())可以解决，难道sicp就是这样做的?
 ;; 
 ;; 3 是这是个迭代版，之前把3些错了，是因为些了类型这个样错误
 ;; (cons (1 2)) 这样的错误，在cons后面放了个括号，和c的语言
@@ -55,3 +56,41 @@
 ;; 要等到下一个节点的只还要调用一次对下一个节点调用一次car。
 ;; 
 ;; 要使用递归的方式解这题，主要是要找到这个问题的递归描述。
+;;   1 一个list的reverse等于这个list的car添加到这个list的cdr的reverse的末尾。
+;;   2 空list的reverse是空list
+;; 这个描述看起来很简单可行，但是为了描述这个问题，我们引入了一个新的问题。
+;; 把一个元素添加到一个list的末尾这样的函数add-tail
+;;
+;; 那么我先有一个新的问题了，描述add-tail。描述这个之前，我们先来看看list
+;; 的结构。
+;; 1 list是有cons的嵌套组成的，car指向当前节点的值，cdr指向这个节点的下一个节点。
+;;   所以这是一个单向的链表，指提供了car和cdr这两个操作来放问这个链表，访问只能
+;;   使用这两个操作顺序的访问链表。
+;; 2 list是通过cons来构造的，是从list的最后一个节点起从尾到头嵌套构造的。
+;; 3 最后还有一点要注意的是list的通过cons构造的时候，最后一个节点的cdr要是nil。
+;;
+;; 根据上面几点，可以知道，要在list前面增加一个元素比较容易，因为list可以看做是表头
+;; 节点，增加一个节点，然后把这个节点的下一节点指向原来的表头节点就行了。
+(define (add-header items item)
+  (cons item items))
+
+;; 但是要在list的末尾加一个节点就没这么容易了，因为list没有记录表尾节点，所以要遍历
+;; 这个表到达表尾才知道。add-tail 的描述如下
+;; 1 在表items末尾增加一个item，等于在items的cdr后面加一个item，然后再这个结果的
+;;   前面在加上一个items的car
+;; 2 当items是空表的时候返回(list item)
+(define (add-tail items item)
+  (if (null? items)
+    (add-header items item)
+    (add-header (add-tail (cdr items) item) (car items))))
+
+;; 记得前面我们引入了一个问题，现在这里刚好就是那个问题了。那么
+(define (reverse4 items)
+  (if (null? items)
+    '()
+    (add-tail (reverse4 (cdr items)) (car items))))
+
+(display (reverse3 (list 1 4 9 16 25)))
+(display newline)
+
+;; 问题解决了。
