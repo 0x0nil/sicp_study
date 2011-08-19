@@ -31,10 +31,12 @@
   password-dispatch)
 
 (define (make-joint acc password new-password)
+  (define (incorrect-password amount)
+    "Incorrect password")
   (define (password-dispatch p m)
     (if (eq? new-password p)
       (acc password m)
-      "Incorrect password"))
+      incorrect-password))
   password-dispatch)
 
 (define peter-acc (make-account 100 'open-sesame))
